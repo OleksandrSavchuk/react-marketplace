@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 function Register() {
+  const navigate = useNavigate();
+
   const [form, setForm] = useState({
     username: '',
     password: '',
@@ -18,11 +21,24 @@ function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      // Реєстрація
       await axios.post('http://localhost:8080/api/v1/auth/register', form);
       alert('Успішна реєстрація!');
+
+      // Логін
+      const loginResponse = await axios.post('http://localhost:8080/api/v1/auth/login', {
+        username: form.username,
+        password: form.password
+      });
+
+      const token = loginResponse.data.accessToken;
+      localStorage.setItem('token', token); // Зберігаємо токен
+
+      // Перехід на сторінку товарів
+      navigate('/products');
     } catch (err) {
       console.error(err);
-      alert('Помилка реєстрації');
+      alert('Помилка реєстрації або логіну');
     }
   };
 

@@ -5,17 +5,30 @@ function ProductList() {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    axios.get('http://localhost:8080/api/v1/products')
-      .then(response => setProducts(response.data))
-      .catch(error => console.error(error));
+    const fetchProducts = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await axios.get('http://localhost:8080/api/v1/products', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        setProducts(response.data);
+      } catch (err) {
+        console.error('Не вдалося завантажити товари', err);
+        alert('Не вдалося завантажити товари');
+      }
+    };
+
+    fetchProducts();
   }, []);
 
   return (
     <div>
-      <h2>Товари</h2>
+      <h2>Список товарів</h2>
       <ul>
-        {products.map(p => (
-          <li key={p.id}>{p.name} — {p.price} грн</li>
+        {products.map((product) => (
+          <li key={product.id}>{product.title} - {product.price} грн</li>
         ))}
       </ul>
     </div>
